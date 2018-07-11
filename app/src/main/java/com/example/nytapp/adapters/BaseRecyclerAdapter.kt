@@ -1,6 +1,5 @@
 package com.example.nytapp.adapters
 
-import android.content.Context
 import android.databinding.DataBindingUtil
 import android.databinding.ViewDataBinding
 import android.support.annotation.LayoutRes
@@ -14,11 +13,10 @@ import com.example.nytapp.BR
 class BaseRecyclerAdapter : RecyclerView.Adapter<BaseRecyclerAdapter.BaseViewHolder>() {
 
     @LayoutRes
-    private var layoutId: Int = 0
+    var layoutId: Int = 0
 
-    private lateinit var items: List<*>
-    private lateinit var context: Context
-    private lateinit var clickListener: CustomClickListener
+    lateinit var items: List<*>
+    var onCustomClickItemListner = fun(view: View, position: Int): Unit = Unit
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -34,22 +32,6 @@ class BaseRecyclerAdapter : RecyclerView.Adapter<BaseRecyclerAdapter.BaseViewHol
         holder.bind(items[position])
     }
 
-    fun setLayoutId(@LayoutRes layoutId: Int) {
-        this.layoutId = layoutId
-    }
-
-    fun setItems(items: List<*>) {
-        this.items = items
-    }
-
-    fun setCustomClickListener(customClickListener: CustomClickListener) {
-        clickListener = customClickListener
-    }
-
-    fun setContext(context: Context) {
-        this.context = context
-    }
-
     inner class BaseViewHolder(val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(ob: Any?) {
@@ -60,12 +42,7 @@ class BaseRecyclerAdapter : RecyclerView.Adapter<BaseRecyclerAdapter.BaseViewHol
         }
 
         fun onCustomClick(view: View, position: Int) {
-            clickListener.onCustomClick(view, position)
+            onCustomClickItemListner(view, position)
         }
-    }
-
-
-    interface CustomClickListener {
-        fun onCustomClick(view: View, position: Int)
     }
 }

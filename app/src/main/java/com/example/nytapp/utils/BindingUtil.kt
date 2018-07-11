@@ -3,7 +3,6 @@ package com.example.nytapp.utils
 import android.databinding.BindingAdapter
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.widget.ImageView
 import com.example.nytapp.R
 import com.example.nytapp.adapters.BaseRecyclerAdapter
@@ -21,8 +20,7 @@ class BindingUtil {
                 val mLayoutManager = LinearLayoutManager(recyclerView.context)
                 recyclerView.layoutManager = mLayoutManager
                 val adapter = recyclerView.adapter as BaseRecyclerAdapter
-                adapter.setItems(items)
-                adapter.setContext(recyclerView.context)
+                adapter.items = items
                 recyclerView.adapter = adapter
             } catch (e: Exception) {
                 e.printStackTrace()

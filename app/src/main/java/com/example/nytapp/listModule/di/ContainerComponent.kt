@@ -28,6 +28,7 @@ interface ContainerComponent {
 @ContainerScope
 @Module
 class ContainerModule {
+
     @ContainerScope
     @Provides
     fun getAdapter() = BaseRecyclerAdapter()

@@ -3,7 +3,6 @@ package com.example.nytapp.listModule.ui
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -18,14 +17,14 @@ import com.example.nytapp.core.Constants
 import com.example.nytapp.core.di.DIHandler
 import com.example.nytapp.core.networking.DataResult
 import com.example.nytapp.dataBase.StoryItem
-import com.example.nytapp.databinding.FragmentContainerBinding
 import com.example.nytapp.listModule.di.ContainerComponent
 import com.example.nytapp.listModule.viewModel.ContainerViewModel
+import com.example.nytapp.utils.visibilityToggle
 import com.example.nytapp.webViewModule.WebViewActivity
-import kotlinx.android.synthetic.main.fragment_container.*
+import kotlinx.android.synthetic.main.fragment_container.view.*
 import javax.inject.Inject
 
-class TopStoriesFragment : Fragment(), BaseRecyclerAdapter.CustomClickListener {
+class TopStoriesFragment : Fragment() {
 
     companion object {
         private val ARG_SECTION_NUMBER = "section_number"
@@ -43,27 +42,26 @@ class TopStoriesFragment : Fragment(), BaseRecyclerAdapter.CustomClickListener {
 
     private val containerComponent: ContainerComponent by lazy { DIHandler.getContainerComponent() }
     private val viewModel: ContainerViewModel by lazy { ViewModelProviders.of(this).get(ContainerViewModel::class.java) }
-    lateinit var binding: FragmentContainerBinding
     lateinit var items: List<StoryItem>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_container, container, false)
+        val view = inflater.inflate(R.layout.fragment_container, container, false)
         containerComponent.inject(this)
 
         viewModel.getResults(arguments!!.getInt(ARG_SECTION_NUMBER))
         items = listOf()
-        adapter.setCustomClickListener(this)
-        binding.rvResultList.layoutManager = LinearLayoutManager(activity)
+        view.rvResultList.layoutManager = LinearLayoutManager(activity)
         if (arguments!!.getInt(ARG_SECTION_NUMBER) == 4)
-            adapter.setLayoutId(R.layout.row_three_items_layout)
+            adapter.layoutId = R.layout.row_three_items_layout
         else
-            adapter.setLayoutId(R.layout.row_avatar_two_items)
-        binding.rvResultList.adapter = adapter
-        adapter.setItems(items)
+            adapter.layoutId = R.layout.row_avatar_two_items
+        view.rvResultList.adapter = adapter
+        adapter.items = items
         observerData()
-        binding.progress.visibility = View.VISIBLE
-        return binding.root
+        view.progress.visibilityToggle(true)
+        adapter.onCustomClickItemListner = { v, i -> onCustomClick(v, i) }
+        return view
     }
 
     /*
@@ -72,11 +70,11 @@ class TopStoriesFragment : Fragment(), BaseRecyclerAdapter.CustomClickListener {
     private fun observerData() {
         viewModel.postDataRepository.observe(this, Observer<DataResult<List<StoryItem>>> { result ->
             when (result) {
-                is DataResult.Progress -> progress.visibility = if (result.loading) View.VISIBLE else View.GONE
+                is DataResult.Progress -> view?.progress?.visibilityToggle(result.loading) /* Extension function to toggle visibility */
                 is DataResult.Success -> {
                     items = result.data
                     Log.i("Sanoop", "Items -> ${items}")
-                    adapter.setItems(items)
+                    adapter.items = items
                     adapter.notifyDataSetChanged()
                 }
                 is DataResult.Failure -> {
@@ -90,7 +88,7 @@ class TopStoriesFragment : Fragment(), BaseRecyclerAdapter.CustomClickListener {
     /*
     * On click of any item from list view
     * */
-    override fun onCustomClick(view: View, position: Int) {
+    fun onCustomClick(view: View, position: Int) {
         val model = items[position]
         when (model.type) {
             Constants.MOVIE,

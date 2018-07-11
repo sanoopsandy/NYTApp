@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.widget.ProgressBar
 import com.example.nytapp.core.networking.DataResult
 import io.reactivex.Completable
 import io.reactivex.Flowable
@@ -95,4 +97,11 @@ fun <T> PublishSubject<DataResult<T>>.loading(isLoading: Boolean) {
  */
 fun Disposable.addTo(compositeDisposable: CompositeDisposable) {
     compositeDisposable.add(this)
+}
+
+/*
+* Progress visibikity toggle
+* */
+fun ProgressBar.visibilityToggle(visible: Boolean) {
+    this.visibility = if (visible) View.VISIBLE else View.GONE
 }
